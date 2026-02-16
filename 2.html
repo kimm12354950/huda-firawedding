@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="id">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Undangan Pernikahan - Huda &amp; Firda</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="/_sdk/data_sdk.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&amp;family=Cormorant+Garamond:wght@300;400;600&amp;family=Montserrat:wght@200;400&amp;display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <style>
+    html, body { height: 100%; margin: 0; padding: 0; }
+    :root {
+      --primary: #4b6345;
+      --accent: #d4af37;
+    }
+    
+    body { font-family: 'Cormorant Garamond', serif; background-color: #f9f9f9; }
+    .font-script { font-family: 'Great Vibes', cursive; }
+    .font-sans { font-family: 'Montserrat', sans-serif; }
+
+    .marble-bg {
+      background: linear-gradient(rgba(255,255,255,0.85), rgba(255,255,255,0.85)), 
+                  url('https://www.transparenttextures.com/patterns/white-marble.png');
+      background-color: #ffffff;
+    }
+
+    .flower-frame {
+      position: absolute; width: 160px; opacity: 0.7; pointer-events: none;
+      z-index: 1;
+    }
+
+    .btn-gold {
+      background-color: white; border: 1px solid var(--primary); color: var(--primary);
+      transition: all 0.3s ease;
+    }
+    .btn-gold:hover { background-color: var(--primary); color: white; }
+
+    .countdown-box {
+      background: rgba(75, 99, 69, 0.08); border-radius: 12px; padding: 12px;
+      min-width: 65px; border: 1px solid rgba(75, 99, 69, 0.15);
+    }
+
+    .gift-card {
+      background: white; border-radius: 20px; border: 1px solid #e5e7eb;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    }
+
+    #music-icon.spin { animation: rotate 4s linear infinite; }
+    @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+    .toast {
+      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+      background: var(--primary); color: white; padding: 10px 25px;
+      border-radius: 50px; opacity: 0; transition: 0.4s; z-index: 999;
+    }
+
+    .guest-item {
+      background: rgba(75, 99, 69, 0.05);
+      border-left: 3px solid var(--primary);
+      animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .input-field {
+      background: white; border: 0;
+      transition: all 0.3s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .input-field:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(75, 99, 69, 0.1);
+    }
+  </style>
+  <style>body { box-sizing: border-box; }</style>
+ </head>
+ <body class="marble-bg text-gray-800 w-full h-full overflow-auto">
+  <div id="youtube-player" style="position: absolute; width: 1px; height: 1px; overflow: hidden; opacity: 0;">
+   <div id="player"></div>
+  </div>
+  <div id="music-control" class="fixed top-5 right-5 z-50 hidden"><button onclick="toggleMusic()" class="bg-white/90 p-3 rounded-full shadow-md border border-gray-100 active:scale-95 transition">
+    <div id="music-icon" class="text-xl">
+     🌿
+    </div></button>
+  </div>
+  <div id="page-landing" class="relative min-h-full flex flex-col items-center justify-center p-6 text-center overflow-hidden w-full">
+   <img src="https://cdn.pixabay.com/photo/2017/08/12/11/24/watercolor-2634127_1280.png" class="flower-frame top-0 left-0 rotate-180" alt="flower" loading="lazy" onerror="console.error('Image failed:', this.src); this.style.display='none';"> <img src="https://cdn.pixabay.com/photo/2017/08/12/11/24/watercolor-2634127_1280.png" class="flower-frame bottom-0 right-0" alt="flower" loading="lazy" onerror="console.error('Image failed:', this.src); this.style.display='none';">
+   <div class="z-10 space-y-6">
+    <p class="font-sans tracking-[0.4em] text-gray-400 uppercase text-[10px]">Welcome to the Wedding</p>
+    <h1 class="font-script text-7xl text-gray-800"><span id="groom-landing">Huda</span> &amp; <span id="bride-landing">Firda</span></h1>
+    <p class="font-sans text-xs tracking-[0.3em] text-gray-500 uppercase border-y border-gray-200 py-3 inline-block px-10" id="date-landing">Minggu, 26 April 2026</p>
+    <div class="pt-6">
+     <button onclick="startInvitation()" class="btn-gold px-12 py-3 rounded-full font-sans text-[10px] uppercase tracking-widest font-bold shadow-sm active:scale-95 transition"> Buka Undangan </button>
+    </div>
+    <div class="flex justify-center gap-2 pt-10 font-sans">
+     <div class="countdown-box"><span id="days" class="block text-xl font-bold text-green-900">00</span><span class="text-[7px] uppercase tracking-tighter">Hari</span>
+     </div>
+     <div class="countdown-box"><span id="hours" class="block text-xl font-bold text-green-900">00</span><span class="text-[7px] uppercase tracking-tighter">Jam</span>
+     </div>
+     <div class="countdown-box"><span id="mins" class="block text-xl font-bold text-green-900">00</span><span class="text-[7px] uppercase tracking-tighter">Menit</span>
+     </div>
+     <div class="countdown-box"><span id="secs" class="block text-xl font-bold text-green-900">00</span><span class="text-[7px] uppercase tracking-tighter">Detik</span>
+     </div>
+    </div>
+   </div>
+  </div>
+  <div id="page-details" class="hidden min-h-full p-4 pb-24 w-full">
+   <div class="max-w-xl mx-auto space-y-12">
+    <div class="bg-white/80 backdrop-blur-md rounded-[40px] p-8 shadow-sm border border-white/50 space-y-14 mt-10">
+     <div class="text-center space-y-8">
+      <p class="font-sans text-[9px] tracking-widest text-green-700 uppercase">Assalamu'alaikum Wr. Wb.</p>
+      <div>
+       <h2 class="font-script text-5xl text-green-900 mb-2" id="groom-name">Miftakul Huda A.R.</h2>
+       <p class="text-[10px] font-sans text-gray-400 uppercase tracking-widest">Putra Dari:</p>
+       <p class="text-base font-semibold text-gray-700" id="groom-parents">Bapak Mustaqim &amp; Ibu Tamah</p>
+      </div>
+      <div class="font-script text-3xl text-gray-300">
+       dengan
+      </div>
+      <div>
+       <h2 class="font-script text-5xl text-green-900 mb-2" id="bride-name">Firda Nur Shafira</h2>
+       <p class="text-[10px] font-sans text-gray-400 uppercase tracking-widest">Putri Dari:</p>
+       <p class="text-base font-semibold text-gray-700" id="bride-parents">Bapak Muhammad Asrar &amp; Ibu Miptahul Jannah</p>
+      </div>
+     </div>
+     <div class="text-center space-y-6 pt-6">
+      <h3 class="font-sans text-[10px] tracking-[0.4em] uppercase text-green-800">Save the Date</h3>
+      <div class="space-y-1">
+       <p class="text-2xl font-bold text-green-900" id="event-date">Minggu, 26 April 2026</p>
+       <p class="text-sm text-gray-600" id="event-time">Pukul 11.00 WIB - Selesai</p>
+       <div class="pt-4">
+        <p class="text-lg font-bold text-gray-800" id="venue-name">SMK 57 Jakarta Selatan</p>
+        <p class="text-[11px] text-gray-500 italic max-w-xs mx-auto" id="venue-address">Jl. Taman Margasatwa Raya No.38B, Jati Padang, Ps. Minggu</p>
+       </div>
+      </div><a href="https://www.google.com/maps/search/?api=1&amp;query=SMKN+57+Jakarta+Selatan" target="_blank" rel="noopener noreferrer" class="inline-block bg-green-900 text-white px-10 py-2.5 rounded-full text-[9px] font-bold uppercase tracking-widest shadow-md hover:bg-green-800 transition">Petunjuk Lokasi</a>
+     </div>
+     <hr class="border-gray-100">
+     <div class="text-center space-y-8">
+      <div>
+       <h3 class="font-script text-4xl text-green-900 mb-2">Wedding Gift</h3>
+       <p class="text-[11px] font-light text-gray-500 leading-relaxed px-10">Doa restu Anda adalah kado terindah bagi kami. Namun jika ingin memberikan tanda kasih, dapat dikirim melalui:</p>
+      </div>
+      <div class="grid grid-cols-1 gap-4">
+       <div class="gift-card p-6 relative overflow-hidden group">
+        <p class="font-sans text-[9px] font-bold text-green-700 tracking-widest uppercase mb-4">Bank Central Asia (BCA)</p>
+        <p id="rek-huda" class="text-2xl font-bold tracking-widest text-gray-800 mb-1">8035066591</p>
+        <p class="text-xs text-gray-500 uppercase font-medium mb-4" id="huda-label">A.n Miftakul Huda</p><button onclick="copyAccount(document.getElementById('rek-huda').textContent)" class="text-[10px] font-bold bg-gray-50 text-green-800 border border-green-100 px-6 py-2 rounded-full hover:bg-green-900 hover:text-white transition active:scale-95">SALIN NOMOR</button>
+       </div>
+       <div class="gift-card p-6 relative overflow-hidden group">
+        <p class="font-sans text-[9px] font-bold text-green-700 tracking-widest uppercase mb-4">Bank Transfer</p>
+        <p id="rek-firda" class="text-2xl font-bold tracking-widest text-gray-800 mb-1">1280639121</p>
+        <p class="text-xs text-gray-500 uppercase font-medium mb-4" id="firda-label">A.n Firda Nur Shafira</p><button onclick="copyAccount(document.getElementById('rek-firda').textContent)" class="text-[10px] font-bold bg-gray-50 text-green-800 border border-green-100 px-6 py-2 rounded-full hover:bg-green-900 hover:text-white transition active:scale-95">SALIN NOMOR</button>
+       </div>
+      </div>
+     </div>
+     <div class="pt-6">
+      <div class="bg-gray-50/80 rounded-3xl p-8 border border-gray-100 shadow-inner">
+       <h3 class="font-script text-4xl text-green-900 text-center mb-6">Konfirmasi Kehadiran</h3>
+       <form id="rsvp-form" class="space-y-4">
+        <input type="text" id="rsvp-name" placeholder="Nama Lengkap" class="input-field w-full px-5 py-3 rounded-xl text-sm" required> <select id="rsvp-attendance" class="input-field w-full px-5 py-3 rounded-xl text-sm appearance-none" required> <option value="">-- Konfirmasi Kehadiran --</option> <option value="hadir">Saya Akan Hadir</option> <option value="tidak-hadir">Maaf, Berhalangan Hadir</option> </select> <button type="submit" class="w-full bg-green-900 text-white py-3.5 rounded-xl font-sans text-[10px] uppercase tracking-widest font-bold shadow-lg active:scale-95 transition hover:bg-green-800">Kirim RSVP</button>
+       </form>
+      </div>
+     </div>
+     <div class="bg-white/50 rounded-3xl p-8 border border-gray-100">
+      <div class="flex justify-between items-center mb-6">
+       <h3 class="font-script text-3xl text-green-900">Daftar Tamu</h3><span id="guest-count" class="bg-green-800 text-white px-3 py-1 rounded-full text-xs font-sans font-bold">0</span>
+      </div>
+      <div id="guest-list" class="space-y-3">
+       <p class="text-gray-400 text-center py-8 text-sm">Belum ada konfirmasi</p>
+      </div>
+     </div>
+     <p class="text-center font-sans text-[10px] text-gray-400 italic">Created with love for Huda &amp; Firda</p>
+    </div><button onclick="backToLanding()" class="w-full mt-8 text-green-800 text-sm font-bold opacity-60 italic underline hover:opacity-100 transition">← Kembali ke Halaman Utama</button>
+   </div>
+  </div>
+  <div id="toast" class="toast font-sans text-[11px] font-bold tracking-widest uppercase">
+   Berhasil Disalin!
+  </div>
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <script>
+    let player;
+    const weddingDate = new Date("April 26, 2026 11:00:00").getTime();
+
+    const defaultConfig = {
+      groom_name: "Miftakul Huda A.R",
+      groom_parents: "Bapak Mustaqim & Ibu Tamah",
+      bride_name: "Firda Nur Shafira",
+      bride_parents: "Bapak Muhammad Asrar & Ibu Miptahul Jannah",
+      wedding_date: "Minggu, 26 April 2026",
+      wedding_time: "11.00 WIB - Selesai",
+      venue_name: "SMK 57 Jakarta Selatan",
+      venue_address: "Jl. Taman Margasatwa Raya No.38B, Jati Padang, Ps. Minggu",
+      groom_account: "8035066591",
+      bride_account: "1280639121"
+    };
+
+    let guestData = [];
+
+    function onYouTubeIframeAPIReady() {
+      player = new YT.Player('player', {
+        height: '1', width: '1',
+        videoId: '8bWRU2ipOwA',
+        playerVars: { 'autoplay': 0, 'controls': 0, 'loop': 1, 'playlist': '8bWRU2ipOwA' }
+      });
+    }
+
+    function startInvitation() {
+      document.getElementById('page-landing').classList.add('hidden');
+      document.getElementById('page-details').classList.remove('hidden');
+      document.getElementById('music-control').classList.remove('hidden');
+      if (player) {
+        player.playVideo();
+        document.getElementById('music-icon').classList.add('spin');
+      }
+      window.scrollTo(0, 0);
+    }
+
+    function backToLanding() {
+      document.getElementById('page-details').classList.add('hidden');
+      document.getElementById('page-landing').classList.remove('hidden');
+      document.getElementById('music-control').classList.add('hidden');
+      if (player) {
+        player.pauseVideo();
+        document.getElementById('music-icon').classList.remove('spin');
+        document.getElementById('music-icon').innerText = "🌿";
+      }
+      window.scrollTo(0, 0);
+    }
+
+    function toggleMusic() {
+      const state = player.getPlayerState();
+      if (state == 1) {
+        player.pauseVideo();
+        document.getElementById('music-icon').classList.remove('spin');
+        document.getElementById('music-icon').innerText = "🔇";
+      } else {
+        player.playVideo();
+        document.getElementById('music-icon').classList.add('spin');
+        document.getElementById('music-icon').innerText = "🌿";
+      }
+    }
+
+    function copyAccount(num) {
+      navigator.clipboard.writeText(num);
+      const toast = document.getElementById('toast');
+      toast.style.opacity = '1';
+      setTimeout(() => toast.style.opacity = '0', 2500);
+    }
+
+    function updateCountdown() {
+      const now = new Date().getTime();
+      const gap = weddingDate - now;
+      document.getElementById("days").innerText = Math.max(0, Math.floor(gap / (1000 * 60 * 60 * 24)));
+      document.getElementById("hours").innerText = Math.max(0, Math.floor((gap % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)));
+      document.getElementById("mins").innerText = Math.max(0, Math.floor((gap % (1000 * 60 * 60)) / (1000 * 60)));
+      document.getElementById("secs").innerText = Math.max(0, Math.floor((gap % (1000 * 60)) / 1000));
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+
+    const dataHandler = {
+      onDataChanged(data) {
+        guestData = data;
+        updateGuestList();
+        document.getElementById('guest-count').textContent = data.length;
+      }
+    };
+
+    async function initDataSDK() {
+      if (window.dataSdk) {
+        await window.dataSdk.init(dataHandler);
+      }
+    }
+
+    function updateGuestList() {
+      const list = document.getElementById('guest-list');
+      
+      if (guestData.length === 0) {
+        list.innerHTML = '<p class="text-gray-400 text-center py-8 text-sm">Belum ada konfirmasi</p>';
+        return;
+      }
+
+      list.innerHTML = guestData.map(guest => {
+        const statusLabel = {
+          'hadir': '✓ Akan Hadir',
+          'tidak-hadir': '✗ Berhalangan'
+        }[guest.attendance] || guest.attendance;
+
+        const statusColor = {
+          'hadir': 'text-green-600',
+          'tidak-hadir': 'text-red-600'
+        }[guest.attendance] || 'text-green-600';
+
+        return `
+          <div class="guest-item rounded-lg p-4">
+            <div class="flex justify-between items-start">
+              <p class="font-medium text-green-900">${guest.name}</p>
+              <span class="font-medium ${statusColor} text-sm">${statusLabel}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    document.getElementById('rsvp-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById('rsvp-name').value.trim();
+      const attendance = document.getElementById('rsvp-attendance').value;
+
+      if (!name || !attendance) {
+        showToast('Mohon lengkapi semua data!');
+        return;
+      }
+
+      if (guestData.length >= 999) {
+        showToast('Kapasitas sudah penuh');
+        return;
+      }
+
+      const btn = e.target.querySelector('button');
+      btn.disabled = true;
+      btn.textContent = 'Mengirim...';
+
+      if (window.dataSdk) {
+        const result = await window.dataSdk.create({
+          name: name,
+          attendance: attendance,
+          createdAt: new Date().toISOString()
+        });
+
+        if (result.isOk) {
+          document.getElementById('rsvp-form').reset();
+          showToast('Konfirmasi berhasil dikirim! 🎉');
+        } else {
+          showToast('Gagal mengirim konfirmasi');
+        }
+      }
+
+      btn.disabled = false;
+      btn.textContent = 'Kirim RSVP';
+    });
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.style.opacity = '1';
+      setTimeout(() => toast.style.opacity = '0', 2500);
+    }
+
+    async function onConfigChange(config) {
+      document.getElementById('groom-name').textContent = config.groom_name || defaultConfig.groom_name;
+      document.getElementById('groom-parents').textContent = config.groom_parents || defaultConfig.groom_parents;
+      document.getElementById('bride-name').textContent = config.bride_name || defaultConfig.bride_name;
+      document.getElementById('bride-parents').textContent = config.bride_parents || defaultConfig.bride_parents;
+      
+      document.getElementById('event-date').textContent = config.wedding_date || defaultConfig.wedding_date;
+      document.getElementById('event-time').textContent = 'Pukul ' + (config.wedding_time || defaultConfig.wedding_time);
+      document.getElementById('venue-name').textContent = config.venue_name || defaultConfig.venue_name;
+      document.getElementById('venue-address').textContent = config.venue_address || defaultConfig.venue_address;
+      
+      document.getElementById('rek-huda').textContent = config.groom_account || defaultConfig.groom_account;
+      document.getElementById('huda-label').textContent = 'A.n ' + (config.groom_name || defaultConfig.groom_name);
+      
+      document.getElementById('rek-firda').textContent = config.bride_account || defaultConfig.bride_account;
+      document.getElementById('firda-label').textContent = 'A.n ' + (config.bride_name || defaultConfig.bride_name);
+
+      const groomShort = (config.groom_name || defaultConfig.groom_name).split(' ')[0];
+      const brideShort = (config.bride_name || defaultConfig.bride_name).split(' ')[0];
+      document.getElementById('groom-landing').textContent = groomShort;
+      document.getElementById('bride-landing').textContent = brideShort;
+    }
+
+    function mapToCapabilities(config) {
+      return {
+        recolorables: [],
+        borderables: [],
+        fontEditable: undefined,
+        fontSizeable: undefined
+      };
+    }
+
+    function mapToEditPanelValues(config) {
+      return new Map([
+        ["groom_name", config.groom_name || defaultConfig.groom_name],
+        ["groom_parents", config.groom_parents || defaultConfig.groom_parents],
+        ["bride_name", config.bride_name || defaultConfig.bride_name],
+        ["bride_parents", config.bride_parents || defaultConfig.bride_parents],
+        ["wedding_date", config.wedding_date || defaultConfig.wedding_date],
+        ["wedding_time", config.wedding_time || defaultConfig.wedding_time],
+        ["venue_name", config.venue_name || defaultConfig.venue_name],
+        ["venue_address", config.venue_address || defaultConfig.venue_address],
+        ["groom_account", config.groom_account || defaultConfig.groom_account],
+        ["bride_account", config.bride_account || defaultConfig.bride_account]
+      ]);
+    }
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities,
+        mapToEditPanelValues
+      });
+    }
+
+    initDataSDK();
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9cedcf7b771b9cf6',t:'MTc3MTI1MjkzNS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
